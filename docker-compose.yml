@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:80"
+    environment:
+      # Run the Solid Queue supervisor inside the same Puma process, so the
+      # every-minute price-fetch job runs without a second container.
+      SOLID_QUEUE_IN_PUMA: "true"
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      CG_API_KEY: ${CG_API_KEY}
+    volumes:
+      # Persist the SQLite databases (primary/cache/queue) across restarts,
+      # so cached prices survive a container recreate.
+      - api_storage:/rails/storage
+
+volumes:
+  api_storage:
